@@ -1,11 +1,11 @@
 package com.jojo.ws.uploader.core.interceptors;
 
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.jojo.ws.uploader.BlockTask;
 import com.jojo.ws.uploader.Interceptor;
+import com.jojo.ws.uploader.WsFileUploader;
 import com.jojo.ws.uploader.core.breakstore.Block;
 
 import java.io.IOException;
@@ -15,10 +15,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 public class BlockUploadInterceptor implements Interceptor {
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(10);
@@ -43,17 +40,18 @@ public class BlockUploadInterceptor implements Interceptor {
         for (Block block : blocks) {
             futures.add(submit(new BlockTask(block.getIndex(), chain, block)));
         }
-        List<Block> resultBlock = new ArrayList<>();
         for (Future<Block> blockFuture : futures) {
             try {
                 Block bl = blockFuture.get();
-                if (bl != null) {
-                    resultBlock.add(bl);
+                for (int i = 0; i < chain.task().getBreakInfo().getBlockList().size(); i++) {
+                    if (bl != null && bl.getIndex() == chain.task().getBreakInfo().getBlockList().get(i).getIndex()) {
+                        chain.task().getBreakInfo().getBlockList().get(i).setUploadSuccess(bl.isUploadSuccess());
+                    }
                 }
+                WsFileUploader.with().handlerDispatcher().postMain(() -> chain.call().uploaderCallback().onBlockUploaded(chain.task().getBreakInfo().getBlockList()));
             } catch (InterruptedException | ExecutionException e) {
             }
         }
-        chain.task().getBreakInfo().setBlocks(resultBlock);
         chain.proceed();
     }
 

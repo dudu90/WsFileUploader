@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.jojo.ws.uploader.core.breakstore.BreakStore;
 import com.jojo.ws.uploader.core.connection.UploadConnection;
+import com.jojo.ws.uploader.core.dispatcher.HandlerDispatcher;
 import com.jojo.ws.uploader.core.dispatcher.UploadDispatcher;
 
 public class WsFileUploader {
@@ -11,11 +12,13 @@ public class WsFileUploader {
     private final BreakStore breakStore;
     private final UploadConnection.Factory uploadConnectionFactory;
     private final UploadDispatcher uploadDispatcher;
+    private final HandlerDispatcher handlerDispatcher;
 
-    WsFileUploader(BreakStore breakStore, UploadConnection.Factory factory, UploadDispatcher uploadDispatcher) {
+    WsFileUploader(BreakStore breakStore, UploadConnection.Factory factory, UploadDispatcher uploadDispatcher, HandlerDispatcher handlerDispatcher) {
         this.breakStore = breakStore;
         this.uploadConnectionFactory = factory;
         this.uploadDispatcher = uploadDispatcher;
+        this.handlerDispatcher = handlerDispatcher;
     }
 
     public static WsFileUploader with() {
@@ -33,6 +36,10 @@ public class WsFileUploader {
         return breakStore;
     }
 
+    public HandlerDispatcher handlerDispatcher() {
+        return handlerDispatcher;
+    }
+
     public UploadConnection.Factory uploadConnectionFactory() {
         return uploadConnectionFactory;
     }
@@ -45,6 +52,7 @@ public class WsFileUploader {
         private BreakStore breakStore;
         private UploadConnection.Factory uploadConnectionFactory;
         private UploadDispatcher uploadDispatcher;
+        private HandlerDispatcher handlerDispatcher;
         private final Context context;
 
         Builder(Context context) {
@@ -66,6 +74,11 @@ public class WsFileUploader {
             return this;
         }
 
+        public Builder handlerDispatcher(HandlerDispatcher handlerDispatcher) {
+            this.handlerDispatcher = handlerDispatcher;
+            return this;
+        }
+
         public WsFileUploader build() {
             if (breakStore == null) {
                 breakStore = Utils.createBreakStoreOnDisk(context);
@@ -77,7 +90,11 @@ public class WsFileUploader {
                 uploadDispatcher = new UploadDispatcher();
             }
 
-            return new WsFileUploader(breakStore, uploadConnectionFactory, uploadDispatcher);
+            if (handlerDispatcher == null) {
+                handlerDispatcher = new HandlerDispatcher();
+            }
+
+            return new WsFileUploader(breakStore, uploadConnectionFactory, uploadDispatcher, handlerDispatcher);
         }
     }
 }

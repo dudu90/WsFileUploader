@@ -30,6 +30,10 @@ public class UploadCall {
         return uploadTask;
     }
 
+    public UploaderCallback uploaderCallback(){
+        return uploaderCallback;
+    }
+
     public final class AsyncCall extends NamedRunnable {
         UploadCall uploadCall;
 

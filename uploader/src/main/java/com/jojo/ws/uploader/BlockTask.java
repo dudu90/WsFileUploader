@@ -105,7 +105,6 @@ public class BlockTask implements Callable<Block> {
 //                return block;
             }
         }
-        Log.d("callLog--->", block.getIndex() + "");
         final boolean success = execute(SLICE_RETRY_COUNT);
         block.setUploadSuccess(success);
         return block;

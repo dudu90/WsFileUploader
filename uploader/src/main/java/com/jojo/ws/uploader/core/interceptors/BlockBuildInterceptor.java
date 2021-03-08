@@ -1,6 +1,7 @@
 package com.jojo.ws.uploader.core.interceptors;
 
 import com.jojo.ws.uploader.Interceptor;
+import com.jojo.ws.uploader.WsFileUploader;
 import com.jojo.ws.uploader.core.breakstore.Block;
 
 import java.io.File;
@@ -14,6 +15,7 @@ public class BlockBuildInterceptor implements Interceptor {
         final File file = chain.task().getUploadFile();
         final Block[] blocks = Block.blocks(file);
         chain.task().setBlocks(blocks);
+        WsFileUploader.with().handlerDispatcher().postMain(() -> chain.call().uploaderCallback().onStart(chain.task()));
         chain.proceed();
     }
 }
