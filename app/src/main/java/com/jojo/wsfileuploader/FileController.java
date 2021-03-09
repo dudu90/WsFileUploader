@@ -21,6 +21,18 @@ public class FileController {
     static String BASE_URL = "https://api.2dland.cn";
     static final String UPLOAD_TOKEN = BASE_URL + "/v3/file/uploadToken";
 
+    public void startBlockUpload(File file,CallBack callBack){
+        new Thread(() -> {
+            try {
+                final UploadToken uploadToken = genConnection(file);
+                if (uploadToken == null) return;
+                callBack.onAccessToken(uploadToken);
+            } catch (JSONException | IOException e) {
+
+            }
+        }).start();
+    }
+
     public void run(File file, UploaderCallback uploaderCallback) {
         new Thread(() -> {
             try {
@@ -48,5 +60,9 @@ public class FileController {
         } else {
             return null;
         }
+    }
+
+    interface  CallBack{
+        void onAccessToken(UploadToken uploadToken);
     }
 }

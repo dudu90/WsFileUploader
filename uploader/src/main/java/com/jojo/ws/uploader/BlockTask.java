@@ -5,6 +5,7 @@ import android.util.Log;
 import com.jojo.ws.uploader.core.breakstore.Block;
 import com.jojo.ws.uploader.core.connection.ProgressListener;
 import com.jojo.ws.uploader.core.connection.UploadConnection;
+import com.jojo.ws.uploader.core.exception.UploadException;
 import com.jojo.ws.uploader.core.slice.Slice;
 
 import org.json.JSONException;
@@ -30,6 +31,9 @@ public class BlockTask implements Callable<Block> {
 
     private boolean execute(int retry) {
         try {
+            if (chain.call().isInterrupt()) {
+                throw new IllegalStateException("other block upload error.");
+            }
             final Slice firstSlice = block.nextSlice();
             String url = chain.task().getPartUploadUrl() + "/mkblk/" + block.getSize() + "/" + block.getIndex();
             UploadConnection connection = WsFileUploader.with().uploadConnectionFactory().create(url);
@@ -54,9 +58,11 @@ public class BlockTask implements Callable<Block> {
             if (retry < SLICE_RETRY_COUNT) {
                 return execute(retry--);
             } else {
+                chain.call().setHasError(true);
                 return false;
             }
         } catch (JSONException e) {
+            chain.call().setHasError(true);
             return false;
         }
     }
@@ -72,6 +78,9 @@ public class BlockTask implements Callable<Block> {
     }
 
     private String uploadSlice(int retry, Slice slice) {
+        if (chain.call().isInterrupt()) {
+            throw new IllegalStateException("other block upload error.");
+        }
         final String url = chain.task().getPartUploadUrl() + "/bput/" + slice.getCtx() + "/" + slice.getOffset();
         try {
             UploadConnection uploadConnection = WsFileUploader.with().uploadConnectionFactory().create(url);
@@ -83,7 +92,11 @@ public class BlockTask implements Callable<Block> {
                     Log.wtf("progressUpdate--->", bytesRead + "," + contentLength + "," + done);
                 }
             });
+            if (chain.call().isInterrupt()) {
+                throw new UploadException("other block upload error.");
+            }
             if (connected.getResponseCode() == 200) {
+
                 JSONObject jsonObject = new JSONObject(connected.getResponseString());
                 chain.task().getProgress().addAndGet(slice.size());
                 WsFileUploader.with().handlerDispatcher().postMain(() -> {
@@ -94,6 +107,10 @@ public class BlockTask implements Callable<Block> {
                 if (retry < SLICE_RETRY_COUNT) {
                     return uploadSlice(retry--, slice);
                 } else {
+                    if (chain.call().isInterrupt()) {
+                        throw new UploadException("other block upload error.");
+                    }
+                    chain.call().setHasError(true);
                     return null;
                 }
             }
@@ -101,9 +118,11 @@ public class BlockTask implements Callable<Block> {
             if (retry < SLICE_RETRY_COUNT) {
                 return uploadSlice(retry--, slice);
             } else {
+                chain.call().setHasError(true);
                 return null;
             }
         } catch (JSONException e) {
+            chain.call().setHasError(true);
             return null;
         }
     }
@@ -115,9 +134,13 @@ public class BlockTask implements Callable<Block> {
                 randomAccessFile = new RandomAccessFile(chain.task().getUploadFile(), "r");
                 block.setRandomAccessFile(randomAccessFile);
             } catch (FileNotFoundException e) {
+                chain.call().setHasError(true);
                 block.setUploadSuccess(false);
-//                return block;
+                return block;
             }
+        }
+        if (chain.call().isInterrupt()) {
+            throw new UploadException("other block upload error.");
         }
         final boolean success = execute(SLICE_RETRY_COUNT);
         block.setUploadSuccess(success);

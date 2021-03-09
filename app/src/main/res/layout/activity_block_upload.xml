@@ -15,6 +15,14 @@
         android:layout_margin="@dimen/dp_10"
         android:text="上传" />
 
+    <Button
+        android:id="@+id/cancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/dp_10"
+        android:text="取消" />
+
+
     <TextView
         android:id="@+id/uploadFile"
         android:layout_width="wrap_content"

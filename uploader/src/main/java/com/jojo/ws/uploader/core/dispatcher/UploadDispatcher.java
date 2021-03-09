@@ -116,7 +116,7 @@ public final class UploadDispatcher {
             UploadCall.AsyncCall asyncCall = runningCallsIterator.next();
             if (asyncCall.get().uploadTask().getId() == id) {
                 asyncCall.get().cancel();
-                readyCalls.remove();
+                runningCallsIterator.remove();
             }
         }
     }

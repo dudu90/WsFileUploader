@@ -15,6 +15,7 @@ public class UploadCall {
     private UploaderCallback uploaderCallback;
 
     private volatile boolean canceled = false;
+    private volatile boolean hasError = false;
 
     public UploadCall(UploadTask uploadTask) {
         this.uploadTask = uploadTask;
@@ -30,8 +31,21 @@ public class UploadCall {
         return uploadTask;
     }
 
-    public UploaderCallback uploaderCallback(){
+    public UploaderCallback uploaderCallback() {
         return uploaderCallback;
+    }
+
+    public synchronized boolean isInterrupt() {
+        return canceled || hasError;
+    }
+
+
+    public synchronized void setCanceled(boolean canceled) {
+        this.canceled = canceled;
+    }
+
+    public synchronized void setHasError(boolean hasError) {
+        this.hasError = hasError;
     }
 
     public final class AsyncCall extends NamedRunnable {
@@ -70,8 +84,8 @@ public class UploadCall {
     }
 
 
-    public void cancel() {
-
+    public synchronized void cancel() {
+        canceled = true;
     }
 
 
