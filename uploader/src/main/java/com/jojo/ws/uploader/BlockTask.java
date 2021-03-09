@@ -1,7 +1,5 @@
 package com.jojo.ws.uploader;
 
-import android.util.Log;
-
 import com.jojo.ws.uploader.core.breakstore.Block;
 import com.jojo.ws.uploader.core.connection.UploadConnection;
 import com.jojo.ws.uploader.core.slice.Slice;

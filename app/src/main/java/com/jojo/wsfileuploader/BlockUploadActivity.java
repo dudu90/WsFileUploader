@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,6 +19,7 @@ import com.thl.filechooser.FileChooser;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class BlockUploadActivity extends AppCompatActivity {
     private Button upload;
@@ -31,6 +31,7 @@ public class BlockUploadActivity extends AppCompatActivity {
     @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AtomicInteger integer =  new AtomicInteger(1);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_block_upload);
         blockList = findViewById(R.id.blockList);
@@ -52,18 +53,18 @@ public class BlockUploadActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onBlockUploaded(List<Block> blocks) {
+                        public void onBlockUploaded(UploadTask uploadTask, List<Block> blocks) {
                             blockAdapter.setNewInstance(blocks);
                             blockAdapter.notifyDataSetChanged();
                         }
 
                         @Override
-                        public void onProgress(int total, int current) {
+                        public void onProgress(UploadTask uploadTask, int total, int current) {
 
                         }
 
                         @Override
-                        public void onEnd() {
+                        public void onEnd(UploadTask uploadTask) {
 
                         }
                     });
@@ -76,7 +77,7 @@ public class BlockUploadActivity extends AppCompatActivity {
                 Toast.makeText(BlockUploadActivity.this, "未获取到存储权限", Toast.LENGTH_SHORT).show();
             }
         }));
-        blockList.setLayoutManager(new GridLayoutManager(getApplicationContext(), 20));
+        blockList.setLayoutManager(new GridLayoutManager(getApplicationContext(), 30));
     }
 
     private void requestPermissins(PermissionUtils.OnPermissionListener mOnPermissionListener) {

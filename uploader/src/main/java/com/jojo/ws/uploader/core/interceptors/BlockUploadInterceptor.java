@@ -1,8 +1,6 @@
 package com.jojo.ws.uploader.core.interceptors;
 
 
-import androidx.annotation.NonNull;
-
 import com.jojo.ws.uploader.BlockTask;
 import com.jojo.ws.uploader.Interceptor;
 import com.jojo.ws.uploader.WsFileUploader;
@@ -15,21 +13,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
 
 public class BlockUploadInterceptor implements Interceptor {
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(10);
-
-    public static ThreadFactory threadFactory(final String name, final boolean daemon) {
-        return new ThreadFactory() {
-            @Override
-            public Thread newThread(@NonNull Runnable runnable) {
-                final Thread result = new Thread(runnable, name);
-                result.setDaemon(daemon);
-                return result;
-            }
-        };
-    }
 
 
     @Override

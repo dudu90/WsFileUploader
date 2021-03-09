@@ -7,9 +7,9 @@ import java.util.List;
 public interface UploaderCallback {
     void onStart(UploadTask uploadTask);
 
-    void onBlockUploaded(List<Block> blocks);
+    void onBlockUploaded(UploadTask uploadTask, List<Block> blocks);
 
-    void onProgress(int total, int current);
+    void onProgress(UploadTask uploadTask, int total, int current);
 
-    void onEnd();
+    void onEnd(UploadTask uploadTask);
 }
