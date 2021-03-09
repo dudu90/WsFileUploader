@@ -89,7 +89,7 @@ public class BlockUploadActivity extends AppCompatActivity {
                                     }
 
                                     @Override
-                                    public void onEnd(UploadTask uploadTask, EndCause endCause) {
+                                    public void onEnd(UploadTask uploadTask, EndCause endCause, Exception exception) {
                                             
                                     }
                                 });

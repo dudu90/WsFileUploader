@@ -1,5 +1,6 @@
 package com.jojo.ws.uploader;
 
+import com.jojo.ws.uploader.core.end.EndCause;
 import com.jojo.ws.uploader.core.interceptors.BlockBuildInterceptor;
 import com.jojo.ws.uploader.core.interceptors.BlockMergeInterceptor;
 import com.jojo.ws.uploader.core.interceptors.BlockUploadInterceptor;
@@ -46,6 +47,11 @@ public class UploadCall {
 
     public synchronized void setHasError(boolean hasError) {
         this.hasError = hasError;
+        WsFileUploader.with().handlerDispatcher().postMain(() -> {
+            if (uploaderCallback != null) {
+                uploaderCallback.onEnd(uploadTask, EndCause.ERROR);
+            }
+        });
     }
 
     public final class AsyncCall extends NamedRunnable {
@@ -86,6 +92,11 @@ public class UploadCall {
 
     public synchronized void cancel() {
         canceled = true;
+        WsFileUploader.with().handlerDispatcher().postMain(() -> {
+            if (uploaderCallback != null) {
+                uploaderCallback.onEnd(uploadTask, EndCause.CANCELED);
+            }
+        });
     }
 
 

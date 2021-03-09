@@ -12,5 +12,5 @@ public interface UploaderCallback {
 
     void onProgress(UploadTask uploadTask, long total, long current);
 
-    void onEnd(UploadTask uploadTask, EndCause cause);
+    void onEnd(UploadTask uploadTask, EndCause cause,Exception errorCause);
 }

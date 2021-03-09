@@ -89,14 +89,12 @@ public class BlockTask implements Callable<Block> {
             UploadConnection.Connected connected = uploadConnection.postExcutedWithProgress(slice.toByteArray(), new ProgressListener() {
                 @Override
                 public void update(long bytesRead, long contentLength, boolean done) {
-                    Log.wtf("progressUpdate--->", bytesRead + "," + contentLength + "," + done);
                 }
             });
             if (chain.call().isInterrupt()) {
                 throw new UploadException("other block upload error.");
             }
             if (connected.getResponseCode() == 200) {
-
                 JSONObject jsonObject = new JSONObject(connected.getResponseString());
                 chain.task().getProgress().addAndGet(slice.size());
                 WsFileUploader.with().handlerDispatcher().postMain(() -> {

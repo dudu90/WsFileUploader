@@ -4,9 +4,7 @@ import com.jojo.ws.uploader.Interceptor;
 import com.jojo.ws.uploader.WsFileUploader;
 import com.jojo.ws.uploader.core.breakstore.Block;
 import com.jojo.ws.uploader.core.connection.UploadConnection;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.jojo.ws.uploader.core.end.EndCause;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -40,11 +38,12 @@ public class BlockMergeInterceptor implements Interceptor {
             return;
         }
         if (connected.getResponseCode() == 200) {
-            try {
-                JSONObject jsonObject = new JSONObject(connected.getResponseString());
-            } catch (JSONException e) {
-
-            }
+            WsFileUploader.with().handlerDispatcher().postMain(() -> chain.call().uploaderCallback().onEnd(chain.task(), EndCause.COMPLETED));
+//            try {
+//                JSONObject jsonObject = new JSONObject(connected.getResponseString());
+//            } catch (JSONException e) {
+//
+//            }
         } else {
 
         }
