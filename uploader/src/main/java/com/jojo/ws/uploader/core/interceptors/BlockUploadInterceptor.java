@@ -34,7 +34,7 @@ public class BlockUploadInterceptor implements Interceptor {
                         chain.task().getBreakInfo().getBlockList().get(i).setUploadSuccess(bl.isUploadSuccess());
                     }
                 }
-                WsFileUploader.with().handlerDispatcher().postMain(() -> chain.call().uploaderCallback().onBlockUploaded(chain.task().getBreakInfo().getBlockList()));
+                WsFileUploader.with().handlerDispatcher().postMain(() -> chain.call().uploaderCallback().onBlockUploaded(chain.task(), chain.task().getBreakInfo().getBlockList()));
             } catch (InterruptedException | ExecutionException e) {
             }
         }

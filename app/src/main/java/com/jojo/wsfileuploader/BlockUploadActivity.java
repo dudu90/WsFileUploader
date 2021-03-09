@@ -7,7 +7,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,21 +27,24 @@ public class BlockUploadActivity extends AppCompatActivity {
     private Button upload;
     private TextView uploadFile;
     private RecyclerView blockList;
+    private ProgressBar contentProgress;
     private FileController fileController;
     private BlockAdapter blockAdapter;
 
     @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        AtomicInteger integer =  new AtomicInteger(1);
+        AtomicInteger integer = new AtomicInteger(1);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_block_upload);
         blockList = findViewById(R.id.blockList);
         uploadFile = findViewById(R.id.uploadFile);
         upload = findViewById(R.id.upload);
+        contentProgress = findViewById(R.id.contentProgress);
         fileController = new FileController();
         blockAdapter = new BlockAdapter();
         blockList.setAdapter(blockAdapter);
+        contentProgress.setMax(100);
         upload.setOnClickListener(view -> requestPermissins(new PermissionUtils.OnPermissionListener() {
             @Override
             public void onPermissionGranted() {
@@ -59,8 +64,10 @@ public class BlockUploadActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onProgress(UploadTask uploadTask, int total, int current) {
-
+                        public void onProgress(UploadTask uploadTask, long total, long current) {
+                            double progress = ((double)current / (double)total)*100;
+                            contentProgress.setProgress((int) progress);
+                            Log.d("onProgress--->", total + ","+current+","+progress);
                         }
 
                         @Override

@@ -23,6 +23,8 @@ public interface UploadConnection {
 
     Connected postExcuted(byte[] data) throws IOException;
 
+    Connected postExcutedWithProgress(byte[] data,ProgressListener progressListener) throws IOException;
+
     Connected postText(String text) throws IOException;
 
 

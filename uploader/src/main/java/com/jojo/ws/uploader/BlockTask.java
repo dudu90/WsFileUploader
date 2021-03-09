@@ -1,6 +1,9 @@
 package com.jojo.ws.uploader;
 
+import android.util.Log;
+
 import com.jojo.ws.uploader.core.breakstore.Block;
+import com.jojo.ws.uploader.core.connection.ProgressListener;
 import com.jojo.ws.uploader.core.connection.UploadConnection;
 import com.jojo.ws.uploader.core.slice.Slice;
 
@@ -34,6 +37,10 @@ public class BlockTask implements Callable<Block> {
             connection.addHeader("Authorization", chain.task().getUploadToken());
             UploadConnection.Connected connected = connection.postExcuted(firstSlice.toByteArray());
             if (connected.getResponseCode() == 200) {
+                chain.task().getProgress().addAndGet(firstSlice.size());
+                WsFileUploader.with().handlerDispatcher().postMain(() -> {
+                    chain.call().uploaderCallback().onProgress(chain.task(), chain.task().getUploadFile().length(), chain.task().getProgress().longValue());
+                });
                 JSONObject jsonObject = new JSONObject(connected.getResponseString());
                 block.setCtx(jsonObject.getString("ctx"));
                 block.setChecksum(jsonObject.getString("checksum"));
@@ -70,9 +77,18 @@ public class BlockTask implements Callable<Block> {
             UploadConnection uploadConnection = WsFileUploader.with().uploadConnectionFactory().create(url);
             uploadConnection.addHeader("UploadBatch", chain.task().getUploadBatch());
             uploadConnection.addHeader("Authorization", chain.task().getUploadToken());
-            UploadConnection.Connected connected = uploadConnection.postExcuted(slice.toByteArray());
+            UploadConnection.Connected connected = uploadConnection.postExcutedWithProgress(slice.toByteArray(), new ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    Log.wtf("progressUpdate--->", bytesRead + "," + contentLength + "," + done);
+                }
+            });
             if (connected.getResponseCode() == 200) {
                 JSONObject jsonObject = new JSONObject(connected.getResponseString());
+                chain.task().getProgress().addAndGet(slice.size());
+                WsFileUploader.with().handlerDispatcher().postMain(() -> {
+                    chain.call().uploaderCallback().onProgress(chain.task(), chain.task().getUploadFile().length(), chain.task().getProgress().longValue());
+                });
                 return jsonObject.getString("ctx");
             } else {
                 if (retry < SLICE_RETRY_COUNT) {

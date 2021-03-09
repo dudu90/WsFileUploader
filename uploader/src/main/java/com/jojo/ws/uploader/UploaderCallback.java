@@ -9,7 +9,7 @@ public interface UploaderCallback {
 
     void onBlockUploaded(UploadTask uploadTask, List<Block> blocks);
 
-    void onProgress(UploadTask uploadTask, int total, int current);
+    void onProgress(UploadTask uploadTask, long total, long current);
 
     void onEnd(UploadTask uploadTask);
 }

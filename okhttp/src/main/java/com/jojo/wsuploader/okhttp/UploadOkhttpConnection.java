@@ -2,6 +2,7 @@ package com.jojo.wsuploader.okhttp;
 
 import android.util.Log;
 
+import com.jojo.ws.uploader.core.connection.ProgressListener;
 import com.jojo.ws.uploader.core.connection.UploadConnection;
 
 import java.io.IOException;
@@ -67,6 +68,15 @@ public class UploadOkhttpConnection implements UploadConnection, UploadConnectio
     public Connected postExcuted(byte[] data) throws IOException {
         RequestBody body = RequestBody.create(MediaType.parse("application/octet-stream"), data);
         requestBuilder.post(body);
+        request = requestBuilder.build();
+        response = client.newCall(request).execute();
+        return this;
+    }
+
+    @Override
+    public Connected postExcutedWithProgress(byte[] data, ProgressListener progressListener) throws IOException {
+        RequestBody body = RequestBody.create(MediaType.parse("application/octet-stream"), data);
+        requestBuilder.post(new ProgressRequestBody(body,progressListener));
         request = requestBuilder.build();
         response = client.newCall(request).execute();
         return this;

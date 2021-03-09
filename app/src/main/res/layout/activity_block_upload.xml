@@ -24,6 +24,13 @@
         android:gravity="center"
         tools:text="上文的文件" />
 
+    <ProgressBar
+        android:id="@+id/contentProgress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_margin="3dp" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/blockList"
         android:layout_width="match_parent"
