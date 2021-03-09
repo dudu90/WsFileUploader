@@ -5,6 +5,7 @@ import android.util.Log;
 import com.jojo.ws.uploader.core.breakstore.Block;
 import com.jojo.ws.uploader.core.connection.ProgressListener;
 import com.jojo.ws.uploader.core.connection.UploadConnection;
+import com.jojo.ws.uploader.core.exception.HttpUploadException;
 import com.jojo.ws.uploader.core.exception.UploadException;
 import com.jojo.ws.uploader.core.slice.Slice;
 
@@ -14,6 +15,7 @@ import org.json.JSONObject;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.net.HttpRetryException;
 import java.util.concurrent.Callable;
 
 public class BlockTask implements Callable<Block> {
@@ -52,17 +54,18 @@ public class BlockTask implements Callable<Block> {
                 block.setOffset(jsonObject.getLong("offset"));
                 return uploadBlock(jsonObject.getString("ctx"));
             } else {
-                throw new IllegalStateException("mkblk failed.");
+                JSONObject jsonObject = new JSONObject(connected.getResponseString());
+                throw new HttpUploadException(block.getIndex(), jsonObject.getString("message"), jsonObject.getInt("code"));
             }
-        } catch (IllegalStateException | IOException e) {
+        } catch (HttpUploadException | IOException e) {
             if (retry < SLICE_RETRY_COUNT) {
                 return execute(retry--);
             } else {
-                chain.call().setHasError(true);
+                chain.call().setHasError(true, e);
                 return false;
             }
         } catch (JSONException e) {
-            chain.call().setHasError(true);
+            chain.call().setHasError(true, e);
             return false;
         }
     }
@@ -102,25 +105,21 @@ public class BlockTask implements Callable<Block> {
                 });
                 return jsonObject.getString("ctx");
             } else {
-                if (retry < SLICE_RETRY_COUNT) {
-                    return uploadSlice(retry--, slice);
-                } else {
-                    if (chain.call().isInterrupt()) {
-                        throw new UploadException("other block upload error.");
-                    }
-                    chain.call().setHasError(true);
-                    return null;
-                }
+                JSONObject jsonObject = new JSONObject(connected.getResponseString());
+                throw new HttpUploadException(block.getIndex(), jsonObject.getString("message"), jsonObject.getInt("code"));
             }
-        } catch (IOException e) {
+        } catch (HttpUploadException | IOException e) {
             if (retry < SLICE_RETRY_COUNT) {
                 return uploadSlice(retry--, slice);
             } else {
-                chain.call().setHasError(true);
+                if (chain.call().isInterrupt()) {
+                    throw new UploadException("other block upload error.");
+                }
+                chain.call().setHasError(true, e);
                 return null;
             }
         } catch (JSONException e) {
-            chain.call().setHasError(true);
+            chain.call().setHasError(true, e);
             return null;
         }
     }
@@ -132,7 +131,7 @@ public class BlockTask implements Callable<Block> {
                 randomAccessFile = new RandomAccessFile(chain.task().getUploadFile(), "r");
                 block.setRandomAccessFile(randomAccessFile);
             } catch (FileNotFoundException e) {
-                chain.call().setHasError(true);
+                chain.call().setHasError(true, e);
                 block.setUploadSuccess(false);
                 return block;
             }

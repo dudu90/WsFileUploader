@@ -45,11 +45,11 @@ public class UploadCall {
         this.canceled = canceled;
     }
 
-    public synchronized void setHasError(boolean hasError) {
+    public synchronized void setHasError(boolean hasError, Exception exception) {
         this.hasError = hasError;
         WsFileUploader.with().handlerDispatcher().postMain(() -> {
             if (uploaderCallback != null) {
-                uploaderCallback.onEnd(uploadTask, EndCause.ERROR);
+                uploaderCallback.onEnd(uploadTask, EndCause.ERROR, exception);
             }
         });
     }
@@ -69,7 +69,7 @@ public class UploadCall {
         @Override
         protected void execute() {
             try {
-                if (get().canceled) {
+                if (get().isInterrupt()) {
                     return;
                 }
                 uploadWithInterceptorChain();
@@ -94,7 +94,7 @@ public class UploadCall {
         canceled = true;
         WsFileUploader.with().handlerDispatcher().postMain(() -> {
             if (uploaderCallback != null) {
-                uploaderCallback.onEnd(uploadTask, EndCause.CANCELED);
+                uploaderCallback.onEnd(uploadTask, EndCause.CANCELED, null);
             }
         });
     }
