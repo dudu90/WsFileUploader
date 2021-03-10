@@ -1,6 +1,5 @@
 package com.jojo.wsuploader.okhttp;
 
-import android.util.Log;
 
 import com.jojo.ws.uploader.core.connection.ProgressListener;
 
@@ -37,7 +36,6 @@ class ProgressRequestBody extends RequestBody {
 
     @Override
     public void writeTo(BufferedSink sink) throws IOException {
-        Log.d("writeTo--->",sink+"");
         requestBody.writeTo(sink);
         if (bufferedSink == null) {
             //包装

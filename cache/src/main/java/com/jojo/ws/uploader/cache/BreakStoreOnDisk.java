@@ -1,5 +1,7 @@
 package com.jojo.ws.uploader.cache;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 
 import com.jojo.ws.uploader.UploadTask;
@@ -10,6 +12,11 @@ import com.jojo.ws.uploader.core.breakstore.BreakStoreOnCache;
 public class BreakStoreOnDisk implements BreakStore {
     private BreakSqliteOpenHelper sqliteOpenHelper;
     private BreakStoreOnCache breakStoreOnCache;
+
+
+    public BreakStoreOnDisk(final Context context) {
+        this(new BreakSqliteOpenHelper(context));
+    }
 
     BreakStoreOnDisk(BreakSqliteOpenHelper sqliteOpenHelper) {
         this.sqliteOpenHelper = sqliteOpenHelper;

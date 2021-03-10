@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.jojo.ws.uploader.core.breakstore.Block;
@@ -61,8 +62,6 @@ public class BreakSqliteOpenHelper extends SQLiteOpenHelper {
                 + CHECKSUM + " VARCHAR, "
                 + CRC32 + " NUMERIC, "
                 + OFFSET + " NUMERIC)");
-
-
     }
 
     @Override
@@ -96,6 +95,7 @@ public class BreakSqliteOpenHelper extends SQLiteOpenHelper {
         final List<BlockInfoRow> blockInfoRows = new ArrayList<>();
         try {
             breakInfoCursor = database.rawQuery("SELECT * FROM " + TABLE_TASK, null);
+            Log.d("loadToCache--->", breakInfoCursor + "");
             while (breakInfoCursor.moveToNext()) {
                 breakInfoRows.add(new BreakInfoRow(breakInfoCursor));
             }

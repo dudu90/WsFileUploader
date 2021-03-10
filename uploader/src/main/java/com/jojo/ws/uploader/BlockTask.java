@@ -1,7 +1,5 @@
 package com.jojo.ws.uploader;
 
-import android.util.Log;
-
 import com.jojo.ws.uploader.core.breakstore.Block;
 import com.jojo.ws.uploader.core.connection.ProgressListener;
 import com.jojo.ws.uploader.core.connection.UploadConnection;
@@ -15,7 +13,6 @@ import org.json.JSONObject;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.net.HttpRetryException;
 import java.util.concurrent.Callable;
 
 public class BlockTask implements Callable<Block> {

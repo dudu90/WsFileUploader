@@ -6,6 +6,9 @@ import com.jojo.ws.uploader.core.breakstore.Block;
 import com.jojo.ws.uploader.core.connection.UploadConnection;
 import com.jojo.ws.uploader.core.end.EndCause;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -34,18 +37,15 @@ public class BlockMergeInterceptor implements Interceptor {
         connection.addHeader("Authorization", chain.task().getUploadToken());
         connection.addHeader("Content-Type", "text/plain");
         UploadConnection.Connected connected = connection.postText(buffer.toString());
-        if (chain.call().isInterrupt()) {
-            return;
-        }
         if (connected.getResponseCode() == 200) {
-            WsFileUploader.with().handlerDispatcher().postMain(() -> chain.call().uploaderCallback().onEnd(chain.task(), EndCause.COMPLETED));
-//            try {
-//                JSONObject jsonObject = new JSONObject(connected.getResponseString());
-//            } catch (JSONException e) {
-//
-//            }
-        } else {
+            WsFileUploader.with().handlerDispatcher().postMain(() -> chain.call().uploaderCallback().onEnd(chain.task(), EndCause.COMPLETED, null));
 
+        } else {
+            try {
+                JSONObject jsonObject = new JSONObject(connected.getResponseString());
+            } catch (JSONException e) {
+
+            }
         }
     }
 }
