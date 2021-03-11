@@ -138,6 +138,7 @@ public class BlockTask implements Callable<Block> {
         }
         final boolean success = execute(SLICE_RETRY_COUNT);
         block.setUploadSuccess(success);
+        WsFileUploader.with().breakStore().updateBlock(chain.task().getId(), block);
         return block;
     }
 }

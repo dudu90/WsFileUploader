@@ -2,8 +2,8 @@ package com.jojo.ws.uploader.cache;
 
 public interface BreakSqliteKey {
     String ID = "id";
-    String UPLOADBATCH="uploadBatch";
-    String INDEX="index";
+    String UPLOADBATCH = "uploadBatch";
+    String INDEX = "block_index";
     String UPLOADTOKEN = "uploadToken";
     String TYPE = "type";
     String FILEPATH = "filePath";
@@ -18,6 +18,7 @@ public interface BreakSqliteKey {
     String START = "start";
     String SIZE = "size";
     String SLICESIZE = "slicesize";
+    String UPLOAD_SUCCESS = "upload_success";
     String CTX = "ctx";
     String CHECKSUM = "checksum";
     String CRC32 = "crc32";

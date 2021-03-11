@@ -5,6 +5,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import com.jojo.ws.uploader.UploadTask;
+import com.jojo.ws.uploader.core.breakstore.Block;
 import com.jojo.ws.uploader.core.breakstore.BreakInfo;
 import com.jojo.ws.uploader.core.breakstore.BreakStore;
 import com.jojo.ws.uploader.core.breakstore.BreakStoreOnCache;
@@ -25,36 +26,41 @@ public class BreakStoreOnDisk implements BreakStore {
 
     @Override
     public BreakInfo get(int id) {
-        return null;
+        return breakStoreOnCache.get(id);
     }
 
     @Override
     public int findOrCreateId(@NonNull UploadTask task) {
-        return 0;
+        return breakStoreOnCache.findOrCreateId(task);
     }
 
     @Override
     public BreakInfo createAndInsert(UploadTask task) {
         final BreakInfo breakInfo = breakStoreOnCache.createAndInsert(task);
-        if (breakInfo.getBlockList().size() == 0) {
-            breakStoreOnCache.updateBlock(task.getId(), task.getBreakInfo().getBlockList());
-        }
-        sqliteOpenHelper.insert(breakStoreOnCache.createAndInsert(task));
-        return breakStoreOnCache.createAndInsert(task);
+        sqliteOpenHelper.insert(breakInfo);
+        return breakInfo;
     }
 
     @Override
     public void onTaskEnd(int id) {
-
+        breakStoreOnCache.onTaskEnd(id);
+        remove(id);
     }
 
     @Override
     public void remove(int id) {
-
+        sqliteOpenHelper.removeTask(id);
     }
 
     @Override
     public void update(BreakInfo breakInfo) {
+        breakStoreOnCache.update(breakInfo);
+        sqliteOpenHelper.update(breakInfo);
+    }
 
+    @Override
+    public void updateBlock(int taskId, Block block) {
+        breakStoreOnCache.updateBlock(taskId, block);
+        sqliteOpenHelper.updateBlock(block);
     }
 }

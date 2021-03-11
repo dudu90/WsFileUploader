@@ -1,6 +1,7 @@
 package com.jojo.ws.uploader;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.jojo.ws.uploader.core.breakstore.BreakStore;
 import com.jojo.ws.uploader.core.breakstore.BreakStoreOnCache;
@@ -17,6 +18,7 @@ public class Utils {
                     .getDeclaredConstructor(Context.class);
             return (BreakStore) constructor.newInstance(context);
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException ignored) {
+            Log.d("createBreakStoreOnDisk-->", ignored.getCause().toString());
         }
         return new BreakStoreOnCache(null);
     }

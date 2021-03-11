@@ -8,12 +8,11 @@ public class Utils {
         //no op
     }
 
-    public static BlockInfoRow blockToRow(Block block) {
-//        return new BlockInfoRow(0, 0, block.getStart(), block.getSize(), block.getSliceSize(), block.getCtx(), block.getChecksum(), block.getCrc32(), block.getOffset());
-        return null;
+    public static BlockInfoRow blockToRow(int id, Block block) {
+        return new BlockInfoRow(0, block.getIndex(), id, block.getStart(), block.getSize(), block.getSliceSize(), block.getCtx(), block.getChecksum(), block.getCrc32(), block.getOffset());
     }
 
     public static BreakInfoRow breakToRow(BreakInfo breakInfo) {
-        return new BreakInfoRow(0, breakInfo.getUploadToken(), "", breakInfo.getFilePath(), breakInfo.isCreated(), breakInfo.getPartUploadUrl(), "", breakInfo.getLocalFile(), breakInfo.getCurrentBlock());
+        return new BreakInfoRow(breakInfo.getId(), breakInfo.getUploadToken(), "", breakInfo.getFilePath(), breakInfo.isCreated(), breakInfo.getPartUploadUrl(), breakInfo.getLocalFile());
     }
 }

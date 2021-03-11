@@ -22,10 +22,14 @@ public class BlockUploadInterceptor implements Interceptor {
     public void intercept(Chain chain) throws IOException {
         final List<Block> blocks = chain.task().getBreakInfo().getBlockList();
         List<Future<Block>> futures = new ArrayList<>();
-        int index = 0;
         for (Block block : blocks) {
-            futures.add(submit(new BlockTask(block.getIndex(), chain, block)));
+            if (block.isUploadSuccess()) {
+                chain.task().getProgress().addAndGet(block.getSize());
+            } else {
+                futures.add(submit(new BlockTask(block.getIndex(), chain, block)));
+            }
         }
+        WsFileUploader.with().handlerDispatcher().postMain(() -> chain.call().uploaderCallback().onProgress(chain.task(), chain.task().getUploadFile().length(), chain.task().getProgress().longValue()));
         for (Future<Block> blockFuture : futures) {
             try {
                 Block bl = blockFuture.get();

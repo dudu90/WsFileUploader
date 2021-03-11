@@ -85,27 +85,7 @@ public class Block {
     }
 
     public static Block[] blocks(File file) {
-        RandomAccessFile randomAccessFile = null;
-        try {
-            randomAccessFile = new RandomAccessFile(file, "r");
-        } catch (FileNotFoundException e) {
-            Log.e("CNCLog", "file not found : " + file);
-            return null;
-        }
-
-        long fileSize = 0;
-        try {
-            fileSize = randomAccessFile.length();
-        } catch (IOException e) {
-        }
-        if (fileSize == 0) {
-            try {
-                randomAccessFile.close();
-            } catch (IOException e) {
-            }
-            return null;
-        }
-
+        long fileSize = file.length();
         int blockCount = (int) ((fileSize + sDefaultBlockSize - 1) / sDefaultBlockSize);// TODO: 2017/5/3
         Block[] blocks = new Block[blockCount];
         long blockSize = sDefaultBlockSize;

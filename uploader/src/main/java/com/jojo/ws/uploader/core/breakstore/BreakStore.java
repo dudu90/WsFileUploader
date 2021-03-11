@@ -14,6 +14,8 @@ public interface BreakStore {
 
     void update(BreakInfo breakInfo);
 
+    void updateBlock(int taskId, Block block);
+
     void onTaskEnd(int id);
 
     void remove(int id);

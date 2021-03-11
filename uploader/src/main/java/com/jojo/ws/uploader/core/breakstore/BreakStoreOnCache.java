@@ -13,12 +13,19 @@ import java.util.List;
 public class BreakStoreOnCache implements BreakStore {
     public static final int FIRST_ID = 1;
     private final SparseArray<BreakInfo> storedInfos;
+    private final SparseArray<BreakInfo> unStoredInfos;
     private final List<Integer> sortedOccupiedIds;
 
 
     public BreakStoreOnCache(SparseArray<BreakInfo> storedInfos) {
+        this(storedInfos, new SparseArray<>());
+    }
+
+
+    public BreakStoreOnCache(SparseArray<BreakInfo> storedInfos, SparseArray<BreakInfo> unStoredInfos) {
         this.storedInfos = storedInfos;
-        final int count =0;
+        this.unStoredInfos = unStoredInfos;
+        final int count = 0;
 
         sortedOccupiedIds = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
@@ -41,10 +48,8 @@ public class BreakStoreOnCache implements BreakStore {
                 return breakInfo.getId();
             }
         }
-
-
         final int id = allocateId();
-        final BreakInfo breakInfo = new BreakInfo(id, task.getPartUploadUrl(), task.getUploadToken(), task.getFilePath(), task.isCreated(), task.getUploadFile().getPath(), 0);
+        final BreakInfo breakInfo = new BreakInfo(id, task.getPartUploadUrl(), task.getUploadToken(), task.getFilePath(), task.isCreated(), task.getUploadFile().getPath());
         putBreakInfo(id, breakInfo);
         return id;
     }
@@ -59,27 +64,43 @@ public class BreakStoreOnCache implements BreakStore {
     @Override
     public BreakInfo createAndInsert(@NonNull UploadTask task) {
         final int id = task.getId();
-        return storedInfos.get(id);
+        final BreakInfo breakInfo = new BreakInfo(task.getId(), task.getPartUploadUrl(), task.getUploadToken(), task.getFilePath(), task.isCreated(), task.getUploadFile().getPath());
+        synchronized (this) {
+            storedInfos.put(id, breakInfo);
+            unStoredInfos.remove(id);
+        }
+        return breakInfo;
     }
 
     @Override
     public void update(BreakInfo breakInfo) {
+        final int id = storedInfos.indexOfKey(breakInfo.getId());
+        storedInfos.setValueAt(id, breakInfo);
+    }
 
+    @Override
+    public synchronized void updateBlock(int taskId, Block block) {
+        final BreakInfo breakInfo = storedInfos.get(taskId);
+        for (int i = 0; i < breakInfo.getBlockList().size(); i++) {
+            if (breakInfo.getBlockList().get(i).getIndex() == block.getIndex()) {
+                breakInfo.getBlockList().set(i, block);
+            }
+        }
     }
 
     @Override
     public void onTaskEnd(int id) {
-
+        remove(id);
     }
 
     @Override
     public void remove(int id) {
-
+        storedInfos.remove(id);
     }
 
     public void putBreakInfo(int id, BreakInfo breakInfo) {
         synchronized (this) {
-            storedInfos.put(id, breakInfo);
+            unStoredInfos.put(id, breakInfo);
         }
     }
 

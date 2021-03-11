@@ -16,17 +16,15 @@ public class BreakInfo {
     private final String filePath;
     private final boolean created;
     private final String localFile;
-    private final int currentBlock;
     private final List<Block> blockList;
 
-    public BreakInfo(int id, String partUploadUrl, String uploadToken, String filePath, boolean created, String localFile, int currentBlock) {
+    public BreakInfo(int id, String partUploadUrl, String uploadToken, String filePath, boolean created, String localFile) {
         this.id = id;
         this.partUploadUrl = partUploadUrl;
         this.uploadToken = uploadToken;
         this.filePath = filePath;
         this.created = created;
         this.localFile = localFile;
-        this.currentBlock = currentBlock;
         blockList = new ArrayList<>();
     }
 
@@ -71,9 +69,6 @@ public class BreakInfo {
         return localFile;
     }
 
-    public int getCurrentBlock() {
-        return currentBlock;
-    }
 
     public List<Block> getBlockList() {
         return blockList;

@@ -8,8 +8,6 @@ import com.jojo.ws.uploader.core.breakstore.Block;
 import com.jojo.ws.uploader.core.breakstore.BreakInfo;
 
 import java.io.File;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -23,13 +21,12 @@ public class UploadTask {
     //server filepath
     private final String filePath;
     private final String directUploadUrl;
-    private final Map<String, List<String>> headerMapFields;
     @Nullable
     private BreakInfo breakInfo;
     private String uploadBatch;
     private volatile AtomicLong progress;
 
-    public UploadTask(String uploadToken, String type, File uploadFile, boolean created, String partUploadUrl, String filePath, String directUploadUrl, Map<String, List<String>> headerMapFields) {
+    public UploadTask(String uploadToken, String type, File uploadFile, boolean created, String partUploadUrl, String filePath, String directUploadUrl) {
         this.uploadToken = uploadToken;
         this.type = type;
         this.uploadFile = uploadFile;
@@ -37,8 +34,8 @@ public class UploadTask {
         this.partUploadUrl = partUploadUrl;
         this.filePath = filePath;
         this.directUploadUrl = directUploadUrl;
-        this.headerMapFields = headerMapFields;
-        this.id = 1;
+        this.id = WsFileUploader.with().breakStore().findOrCreateId(this);
+        breakInfo = WsFileUploader.with().breakStore().createAndInsert(this);
         progress = new AtomicLong();
     }
 
@@ -94,10 +91,6 @@ public class UploadTask {
         return directUploadUrl;
     }
 
-    public Map<String, List<String>> getHeaderMapFields() {
-        return headerMapFields;
-    }
-
 
     @Override
     public boolean equals(Object o) {
@@ -128,30 +121,20 @@ public class UploadTask {
 
     @Nullable
     public BreakInfo getBreakInfo() {
-        if (breakInfo == null) {
-            breakInfo = new BreakInfo(id, partUploadUrl, uploadToken, filePath, created, getUploadFile().getPath(), 0);
-//            breakInfo = WsFileUploader.with().breakStore().createAndInsert(this);
-        }
         return breakInfo;
     }
 
     public static class Builder {
         final UploadToken uploadToken;
         final String filePath;
-        private Map<String, List<String>> headerMapFields;
 
         public Builder(UploadToken uploadToken, String filePath) {
             this.uploadToken = uploadToken;
             this.filePath = filePath;
         }
 
-        public Builder header(Map<String, List<String>> headerMapFields) {
-            this.headerMapFields = headerMapFields;
-            return this;
-        }
-
         public UploadTask build() {
-            return new UploadTask(uploadToken.uploadToken, uploadToken.type, new File(filePath), uploadToken.created, uploadToken.partUploadUrl, uploadToken.filePath, uploadToken.directUploadUrl, headerMapFields);
+            return new UploadTask(uploadToken.uploadToken, uploadToken.type, new File(filePath), uploadToken.created, uploadToken.partUploadUrl, uploadToken.filePath, uploadToken.directUploadUrl);
         }
     }
 

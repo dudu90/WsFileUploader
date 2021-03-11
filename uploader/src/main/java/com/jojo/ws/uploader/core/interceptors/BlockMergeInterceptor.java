@@ -39,7 +39,6 @@ public class BlockMergeInterceptor implements Interceptor {
         UploadConnection.Connected connected = connection.postText(buffer.toString());
         if (connected.getResponseCode() == 200) {
             WsFileUploader.with().handlerDispatcher().postMain(() -> chain.call().uploaderCallback().onEnd(chain.task(), EndCause.COMPLETED, null));
-
         } else {
             try {
                 JSONObject jsonObject = new JSONObject(connected.getResponseString());
