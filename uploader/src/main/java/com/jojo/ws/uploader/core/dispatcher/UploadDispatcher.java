@@ -112,13 +112,14 @@ public final class UploadDispatcher {
             }
         }
         Iterator<UploadCall.AsyncCall> runningCallsIterator = runningAsyncCalls.iterator();
-        while (runningCallsIterator.hasNext()){
+        while (runningCallsIterator.hasNext()) {
             UploadCall.AsyncCall asyncCall = runningCallsIterator.next();
             if (asyncCall.get().uploadTask().getId() == id) {
                 asyncCall.get().cancel();
                 runningCallsIterator.remove();
             }
         }
+        promoteCalls();
     }
 
 
