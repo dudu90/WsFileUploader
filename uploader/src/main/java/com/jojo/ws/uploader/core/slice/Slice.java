@@ -60,4 +60,8 @@ public class Slice {
     public void setRetry(int retry) {
         this.mRetry = retry;
     }
+
+    public void recycler() {
+        mData = null;
+    }
 }

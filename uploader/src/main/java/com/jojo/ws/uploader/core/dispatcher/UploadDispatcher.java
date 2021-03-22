@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  * of calls concurrently.
  */
 public final class UploadDispatcher {
-    private int maxRequests = 64;
+    private int maxRequests = 5;
     private @Nullable
     Runnable idleCallback;
 

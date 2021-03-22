@@ -1,11 +1,10 @@
 package com.jojo.wsfileuploader;
 
+import android.util.Log;
 
 import com.google.gson.Gson;
-import com.jojo.ws.uploader.UploadCall;
-import com.jojo.ws.uploader.UploadTask;
+import com.jojo.ws.uploader.Interceptor;
 import com.jojo.ws.uploader.UploadToken;
-import com.jojo.ws.uploader.UploaderCallback;
 import com.jojo.ws.uploader.WsFileUploader;
 import com.jojo.ws.uploader.core.connection.UploadConnection;
 import com.jojo.ws.uploader.utils.Etag;
@@ -17,33 +16,25 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 
-public class FileController {
+// return new UploadTask(uploadToken.uploadToken, uploadToken.type, new File(filePath), uploadToken.created, uploadToken.partUploadUrl, uploadToken.filePath, uploadToken.directUploadUrl);
+public class RequestUploadUrlInterceptor implements Interceptor {
     static String BASE_URL = "https://api.2dland.cn";
     static final String UPLOAD_TOKEN = BASE_URL + "/v3/file/uploadToken";
 
-    public void startBlockUpload(File file, CallBack callBack) {
-        new Thread(() -> {
-            try {
-                final UploadToken uploadToken = genConnection(file);
-                if (uploadToken == null) return;
-                callBack.onAccessToken(uploadToken);
-            } catch (JSONException | IOException e) {
-
-            }
-        }).start();
-    }
-
-    public void run(File file, UploaderCallback uploaderCallback) {
-        new Thread(() -> {
-            try {
-                final UploadToken uploadToken = genConnection(file);
-                if (uploadToken == null) return;
-                UploadTask uploadTask = new UploadTask.Builder(file.getPath(), file.getPath()).build();
-                new UploadCall(uploadTask).enqueue(uploaderCallback);
-            } catch (JSONException | IOException e) {
-
-            }
-        }).start();
+    @Override
+    public void intercept(Chain chain) throws IOException {
+        try {
+            final UploadToken uploadToken = genConnection(chain.task().getUploadFile());
+            Log.d("intercept_token--->", uploadToken.toString() + chain.task().getId());
+            chain.task().setUploadToken(uploadToken.uploadToken);
+            chain.task().setType(uploadToken.type);
+            chain.task().setCreated(uploadToken.created);
+            chain.task().setPartUploadUrl(uploadToken.partUploadUrl);
+            chain.task().setDirectUploadUrl(uploadToken.directUploadUrl);
+            chain.proceed();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public UploadToken genConnection(File file) throws IOException, JSONException {
@@ -55,14 +46,13 @@ public class FileController {
         jsonObject.put("hash", Etag.file(file));
         UploadConnection.Connected connected = connection.excuted(jsonObject.toString());
         if (connected.getResponseCode() == 200) {
-            UploadToken uploadToken = new Gson().fromJson(connected.getResponseString(), UploadToken.class);
+            String result = connected.getResponseString();
+            Log.d("genConnection--->", result);
+            UploadToken uploadToken = new Gson().fromJson(result, UploadToken.class);
             return uploadToken;
         } else {
             return null;
         }
     }
 
-    interface CallBack {
-        void onAccessToken(UploadToken uploadToken);
-    }
 }

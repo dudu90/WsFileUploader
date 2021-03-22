@@ -13,14 +13,14 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class UploadTask {
     private int id;
-    private final String uploadToken;
-    private final String type;
-    private final File uploadFile;
-    private final boolean created;
-    private final String partUploadUrl;
+    private String uploadToken;
+    private String type;
+    private File uploadFile;
+    private boolean created;
+    private String partUploadUrl;
     //server filepath
-    private final String filePath;
-    private final String directUploadUrl;
+    private String filePath;
+    private String directUploadUrl;
     @Nullable
     private BreakInfo breakInfo;
     private String uploadBatch;
@@ -37,6 +37,37 @@ public class UploadTask {
         this.id = WsFileUploader.with().breakStore().findOrCreateId(this);
         breakInfo = WsFileUploader.with().breakStore().createAndInsert(this);
         progress = new AtomicLong();
+    }
+
+    public void setUploadToken(String uploadToken) {
+        this.uploadToken = uploadToken;
+        breakInfo.setUploadToken(uploadToken);
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setUploadFile(File uploadFile) {
+        this.uploadFile = uploadFile;
+    }
+
+    public void setCreated(boolean created) {
+        this.created = created;
+        breakInfo.setCreated(created);
+    }
+
+    public void setPartUploadUrl(String partUploadUrl) {
+        this.partUploadUrl = partUploadUrl;
+        breakInfo.setPartUploadUrl(partUploadUrl);
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public void setDirectUploadUrl(String directUploadUrl) {
+        this.directUploadUrl = directUploadUrl;
     }
 
     public String getUploadBatch() {
@@ -125,15 +156,21 @@ public class UploadTask {
     }
 
     public static class Builder {
-        final UploadToken uploadToken;
+        UploadToken uploadToken;
         final String filePath;
+        final String uploadPath;
 
-        public Builder(UploadToken uploadToken, String filePath) {
+        public Builder(String uploadPath, String filePath) {
+            this.uploadPath = uploadPath;
             this.uploadToken = uploadToken;
             this.filePath = filePath;
         }
 
+
         public UploadTask build() {
+            if (uploadToken == null) {
+                return new UploadTask(null, null, new File(filePath), false, null, uploadPath, null);
+            }
             return new UploadTask(uploadToken.uploadToken, uploadToken.type, new File(filePath), uploadToken.created, uploadToken.partUploadUrl, uploadToken.filePath, uploadToken.directUploadUrl);
         }
     }

@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class BlockUploadInterceptor implements Interceptor {
-    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(10);
+    private final ExecutorService EXECUTOR = Executors.newFixedThreadPool(2);
 
 
     @Override

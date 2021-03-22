@@ -1,5 +1,6 @@
 package com.jojo.ws.uploader;
 
+
 import com.jojo.ws.uploader.core.breakstore.Block;
 import com.jojo.ws.uploader.core.connection.ProgressListener;
 import com.jojo.ws.uploader.core.connection.UploadConnection;
@@ -20,7 +21,6 @@ public class BlockTask implements Callable<Block> {
     private final Interceptor.Chain chain;
     private final int index;
     private Block block;
-    private RandomAccessFile randomAccessFile;
 
     public BlockTask(final int index, Interceptor.Chain chain, Block block) {
         this.index = index;
@@ -123,22 +123,15 @@ public class BlockTask implements Callable<Block> {
 
     @Override
     public Block call() throws Exception {
-        if (randomAccessFile == null) {
-            try {
-                randomAccessFile = new RandomAccessFile(chain.task().getUploadFile(), "r");
-                block.setRandomAccessFile(randomAccessFile);
-            } catch (FileNotFoundException e) {
-                chain.call().setHasError(true, e);
-                block.setUploadSuccess(false);
-                return block;
-            }
-        }
         if (chain.call().isInterrupt()) {
             throw new UploadException("other block upload error.");
         }
+        block.setRandomAccessFile(chain.call().getRandomAccessFile());
         final boolean success = execute(SLICE_RETRY_COUNT);
         block.setUploadSuccess(success);
         WsFileUploader.with().breakStore().updateBlock(chain.task().getId(), block);
+        block.setRandomAccessFile(null);
+        block.recycle();
         return block;
     }
 }

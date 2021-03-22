@@ -66,7 +66,7 @@ public class BlockUploadActivity extends AppCompatActivity {
                         fileController.startBlockUpload(new File(filePath), uploadToken -> {
                             runOnUiThread(() -> {
                                 if (uploadToken == null) return;
-                                uploadTask = new UploadTask.Builder(uploadToken, filePath).build();
+                                uploadTask = new UploadTask.Builder(filePath, filePath).build();
                                 uploadCall = new UploadCall(uploadTask);
                                 uploadCall.enqueue(new UploaderCallback() {
 

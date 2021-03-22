@@ -14,5 +14,12 @@
         android:layout_margin="@dimen/dp_10"
         android:text="Block上传" />
 
+    <Button
+        android:id="@+id/listUpload"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/dp_10"
+        android:text="列表上传" />
+
 
 </LinearLayout>

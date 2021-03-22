@@ -30,6 +30,7 @@ public class BlockMergeInterceptor implements Interceptor {
         if (chain.call().isInterrupt()) {
             return;
         }
+        chain.call().getRandomAccessFile().close();
         final String uploadBatch = chain.task().getUploadBatch();
         final String url = chain.task().getPartUploadUrl() + "/mkfile/" + chain.task().getUploadFile().length();
         UploadConnection connection = WsFileUploader.with().uploadConnectionFactory().create(url);

@@ -8,6 +8,7 @@ import com.jojo.ws.uploader.core.end.EndCause;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.UUID;
 
 public class BlockBuildInterceptor implements Interceptor {
@@ -27,6 +28,7 @@ public class BlockBuildInterceptor implements Interceptor {
             breakInfo = chain.task().getBreakInfo();
         }
         chain.task().setBreakInfo(breakInfo);
+        chain.call().setRandomAccessFile(new RandomAccessFile(file, "r"));
         if (chain.task().getBreakInfo().getBlockList().size() == 0) {
             final Block[] blocks = Block.blocks(file);
             chain.task().setBlocks(blocks);

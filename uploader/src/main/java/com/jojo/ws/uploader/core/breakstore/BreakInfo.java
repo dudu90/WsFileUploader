@@ -10,13 +10,13 @@ import java.util.List;
 
 public class BreakInfo {
     private int id;
-    private final String partUploadUrl;
-    private final String uploadToken;
+    private String partUploadUrl;
+    private String uploadToken;
     //server path
-    private final String filePath;
-    private final boolean created;
-    private final String localFile;
-    private final List<Block> blockList;
+    private String filePath;
+    private boolean created;
+    private String localFile;
+    private List<Block> blockList;
 
     public BreakInfo(int id, String partUploadUrl, String uploadToken, String filePath, boolean created, String localFile) {
         this.id = id;
@@ -26,6 +26,30 @@ public class BreakInfo {
         this.created = created;
         this.localFile = localFile;
         blockList = new ArrayList<>();
+    }
+
+    public void setPartUploadUrl(String partUploadUrl) {
+        this.partUploadUrl = partUploadUrl;
+    }
+
+    public void setUploadToken(String uploadToken) {
+        this.uploadToken = uploadToken;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public void setCreated(boolean created) {
+        this.created = created;
+    }
+
+    public void setLocalFile(String localFile) {
+        this.localFile = localFile;
+    }
+
+    public void setBlockList(List<Block> blockList) {
+        this.blockList = blockList;
     }
 
     public void setId(int id) {

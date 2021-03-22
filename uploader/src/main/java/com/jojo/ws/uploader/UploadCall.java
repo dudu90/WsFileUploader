@@ -7,6 +7,7 @@ import com.jojo.ws.uploader.core.interceptors.BlockUploadInterceptor;
 import com.jojo.ws.uploader.core.interceptors.CacheInterceptor;
 
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class UploadCall {
 
     private volatile boolean canceled = false;
     private volatile boolean hasError = false;
+    private volatile RandomAccessFile randomAccessFile;
 
     public UploadCall(UploadTask uploadTask) {
         this.uploadTask = uploadTask;
@@ -27,6 +29,14 @@ public class UploadCall {
         WsFileUploader.with().uploadDispatcher().enqueue(new AsyncCall(this));
     }
 
+
+    public RandomAccessFile getRandomAccessFile() {
+        return randomAccessFile;
+    }
+
+    public void setRandomAccessFile(RandomAccessFile randomAccessFile) {
+        this.randomAccessFile = randomAccessFile;
+    }
 
     public UploadTask uploadTask() {
         return uploadTask;
@@ -81,6 +91,7 @@ public class UploadCall {
 
     public void uploadWithInterceptorChain() throws IOException {
         List<Interceptor> interceptors = new ArrayList<>();
+        interceptors.addAll(WsFileUploader.with().interceptorDispatcher().getInterceptors());
         interceptors.add(new BlockBuildInterceptor());
         interceptors.add(new CacheInterceptor());
         interceptors.add(new BlockUploadInterceptor());

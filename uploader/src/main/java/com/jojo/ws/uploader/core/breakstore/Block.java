@@ -36,11 +36,11 @@ public class Block {
     private boolean uploadSuccess = false;
     private int errorCode;
 
-    Block( int index, long start, long blockSize, int sliceSize) {
-        this( index, null, null, 0, 0, start, blockSize, sliceSize);
+    Block(int index, long start, long blockSize, int sliceSize) {
+        this(index, null, null, 0, 0, start, blockSize, sliceSize);
     }
 
-    public Block( int index, String ctx, String checksum, long crc32, long offset, long start, long size, int sliceSize) {
+    public Block(int index, String ctx, String checksum, long crc32, long offset, long start, long size, int sliceSize) {
         this.ctx = ctx;
         this.checksum = checksum;
         this.crc32 = crc32;
@@ -84,7 +84,7 @@ public class Block {
         return uploadSuccess;
     }
 
-    public static Block[] blocks(File file) {
+    public static Block[] blocks(File file) throws FileNotFoundException {
         long fileSize = file.length();
         int blockCount = (int) ((fileSize + sDefaultBlockSize - 1) / sDefaultBlockSize);// TODO: 2017/5/3
         Block[] blocks = new Block[blockCount];
@@ -106,7 +106,7 @@ public class Block {
         return sliceIndex * getSliceSize() < size;
     }
 
-    public Slice nextSlice() {
+    public synchronized Slice nextSlice() {
         return getSlice(sliceIndex++);
     }
 
@@ -138,6 +138,13 @@ public class Block {
             return new Slice(index * getSliceSize(), sliceData);//记录最后一片
         } else {
             return new Slice(index * getSliceSize(), mByteArray);
+        }
+    }
+
+    public void recycle() {
+        if (mByteArray != null) {
+            mByteArray.clear();
+            mByteArray = null;
         }
     }
 

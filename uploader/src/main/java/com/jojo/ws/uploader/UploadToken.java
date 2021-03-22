@@ -1,10 +1,10 @@
 package com.jojo.ws.uploader;
 
 public class UploadToken {
-    String uploadToken;
-    String type;
-    String filePath;
-    boolean created;
-    String partUploadUrl;
-    String directUploadUrl;
+    public String uploadToken;
+    public String type;
+    public String filePath;
+    public boolean created;
+    public String partUploadUrl;
+    public String directUploadUrl;
 }

@@ -76,7 +76,7 @@ public class UploadOkhttpConnection implements UploadConnection, UploadConnectio
     @Override
     public Connected postExcutedWithProgress(byte[] data, ProgressListener progressListener) throws IOException {
         RequestBody body = RequestBody.create(MediaType.parse("application/octet-stream"), data);
-        requestBuilder.post(new ProgressRequestBody(body,progressListener));
+        requestBuilder.post(body);
         request = requestBuilder.build();
         response = client.newCall(request).execute();
         return this;
@@ -140,8 +140,9 @@ public class UploadOkhttpConnection implements UploadConnection, UploadConnectio
         if (response == null) throw new IOException("Please invoke execute first!");
         final ResponseBody body = response.body();
         if (body == null) throw new IOException("no body found on response!");
-        Log.d("getResponseString--->", body.toString());
-        return body.string();
+        String bodyString=body.string();
+        body.close();
+        return bodyString;
     }
 
     @Override
@@ -176,7 +177,7 @@ public class UploadOkhttpConnection implements UploadConnection, UploadConnectio
             if (clientBuilder == null) {
                 HttpLoggingInterceptor logInterceptor = new HttpLoggingInterceptor(message -> Log.d("HttpLogInfo", message));
                 logInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-                clientBuilder = new OkHttpClient.Builder().addInterceptor(logInterceptor);
+                clientBuilder = new OkHttpClient.Builder();
             }
             return clientBuilder;
         }
