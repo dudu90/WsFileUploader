@@ -4,5 +4,6 @@ public enum EndCause {
     COMPLETED,
     ERROR,
     CANCELED,
-    FILE_NULL
+    FILE_NULL,
+    RUNNING
 }

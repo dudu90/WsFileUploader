@@ -27,35 +27,34 @@ public class UploadListController {
     }
 
     List<UploadCall> initTasks(String file) {
-        if (uploaderCallback == null) {
-            uploaderCallback = new UploaderCallback() {
-                @Override
-                public void onStart(UploadTask uploadTask) {
-                    callBack.onPull();
-                }
-
-                @Override
-                public void onBlockUploaded(UploadTask uploadTask, List<Block> blocks) {
-                    callBack.onPull();
-                }
-
-                @Override
-                public void onProgress(UploadTask uploadTask, long total, long current) {
-                    callBack.onPull();
-                }
-
-                @Override
-                public void onEnd(UploadTask uploadTask, EndCause cause, Exception errorCause) {
-                    if (errorCause != null) {
-                        errorCause.printStackTrace();
-                    }
-                    callBack.onPull();
-                }
-            };
-        }
         final UploadTask uploadTask = new UploadTask.Builder("/", file).build();
+        Log.d("initTask--->", uploadTask.getId() + "");
         final UploadCall uploadCall = new UploadCall(uploadTask);
-        callList.add(uploadCall);
+        uploaderCallback = new UploaderCallback() {
+            @Override
+            public void onStart(UploadTask uploadTask) {
+                callList.add(uploadCall);
+                callBack.onPull();
+            }
+
+            @Override
+            public void onBlockUploaded(UploadTask uploadTask, List<Block> blocks) {
+                callBack.onPull();
+            }
+
+            @Override
+            public void onProgress(UploadTask uploadTask, long total, long current) {
+                callBack.onPull();
+            }
+
+            @Override
+            public void onEnd(UploadTask uploadTask, EndCause cause, Exception errorCause) {
+                if (errorCause != null) {
+                    errorCause.printStackTrace();
+                }
+                callBack.onPull();
+            }
+        };
         uploadCall.enqueue(uploaderCallback);
         return callList;
     }

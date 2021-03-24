@@ -2,17 +2,20 @@ package com.jojo.ws.uploader;
 
 import android.text.TextUtils;
 
-import androidx.annotation.Nullable;
 
 import com.jojo.ws.uploader.core.breakstore.Block;
 import com.jojo.ws.uploader.core.breakstore.BreakInfo;
 
 import java.io.File;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class UploadTask {
     private int id;
+    private String tokenGetUrl;
+    private String serverFileName;
+    private Map<String, String> tokenGetHeader;
     private String uploadToken;
     private String type;
     private File uploadFile;
@@ -21,22 +24,58 @@ public class UploadTask {
     //server filepath
     private String filePath;
     private String directUploadUrl;
-    @Nullable
     private BreakInfo breakInfo;
     private String uploadBatch;
     private volatile AtomicLong progress;
 
-    public UploadTask(String uploadToken, String type, File uploadFile, boolean created, String partUploadUrl, String filePath, String directUploadUrl) {
-        this.uploadToken = uploadToken;
-        this.type = type;
+    /**
+     * @param tokenGetUrl    拉去token的url
+     * @param serverFileName 上传到服务器后的文件名
+     * @param tokenGetHeader 获取token的auth header
+     * @param uploadFile     本地文件
+     * @param filePath       服务器文件地址
+     */
+    public UploadTask(final String tokenGetUrl,
+                      final String serverFileName,
+                      final Map<String, String> tokenGetHeader,
+                      final File uploadFile,
+                      final String filePath) {
+        this.tokenGetUrl = tokenGetUrl;
+        this.serverFileName = serverFileName;
+        this.tokenGetHeader = tokenGetHeader;
         this.uploadFile = uploadFile;
-        this.created = created;
-        this.partUploadUrl = partUploadUrl;
         this.filePath = filePath;
-        this.directUploadUrl = directUploadUrl;
         this.id = WsFileUploader.with().breakStore().findOrCreateId(this);
         breakInfo = WsFileUploader.with().breakStore().createAndInsert(this);
         progress = new AtomicLong();
+    }
+
+    public String getTokenGetUrl() {
+        return tokenGetUrl;
+    }
+
+    public void setTokenGetUrl(String tokenGetUrl) {
+        this.tokenGetUrl = tokenGetUrl;
+    }
+
+    public String getServerFileName() {
+        return serverFileName;
+    }
+
+    public void setServerFileName(String serverFileName) {
+        this.serverFileName = serverFileName;
+    }
+
+    public Map<String, String> getTokenGetHeader() {
+        return tokenGetHeader;
+    }
+
+    public void setTokenGetHeader(Map<String, String> tokenGetHeader) {
+        this.tokenGetHeader = tokenGetHeader;
+    }
+
+    public void setProgress(AtomicLong progress) {
+        this.progress = progress;
     }
 
     public void setUploadToken(String uploadToken) {
@@ -150,28 +189,39 @@ public class UploadTask {
         }
     }
 
-    @Nullable
     public BreakInfo getBreakInfo() {
         return breakInfo;
     }
 
     public static class Builder {
-        UploadToken uploadToken;
-        final String filePath;
+        final String localFilePath;
         final String uploadPath;
+        private String tokenGetUrl;
+        private String serverFileName;
+        private Map<String, String> tokenGetHeader;
 
-        public Builder(String uploadPath, String filePath) {
+        public Builder(String uploadPath, String localFilePath) {
             this.uploadPath = uploadPath;
-            this.uploadToken = uploadToken;
-            this.filePath = filePath;
+            this.localFilePath = localFilePath;
         }
 
+        public Builder tokenGetUrl(final String tokenGetUrl) {
+            this.tokenGetUrl = tokenGetUrl;
+            return this;
+        }
+
+        public Builder serverFileName(final String serverFileName) {
+            this.serverFileName = serverFileName;
+            return this;
+        }
+
+        public Builder tokenGetHeader(final Map<String, String> tokenGetHeader) {
+            this.tokenGetHeader = tokenGetHeader;
+            return this;
+        }
 
         public UploadTask build() {
-            if (uploadToken == null) {
-                return new UploadTask(null, null, new File(filePath), false, null, uploadPath, null);
-            }
-            return new UploadTask(uploadToken.uploadToken, uploadToken.type, new File(filePath), uploadToken.created, uploadToken.partUploadUrl, uploadToken.filePath, uploadToken.directUploadUrl);
+            return new UploadTask(tokenGetUrl, serverFileName, tokenGetHeader, new File(localFilePath), uploadPath);
         }
     }
 

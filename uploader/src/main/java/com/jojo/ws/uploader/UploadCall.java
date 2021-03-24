@@ -1,6 +1,7 @@
 package com.jojo.ws.uploader;
 
 import com.jojo.ws.uploader.core.end.EndCause;
+import com.jojo.ws.uploader.core.interceptors.BaseInfoInterceptor;
 import com.jojo.ws.uploader.core.interceptors.BlockBuildInterceptor;
 import com.jojo.ws.uploader.core.interceptors.BlockMergeInterceptor;
 import com.jojo.ws.uploader.core.interceptors.BlockUploadInterceptor;
@@ -92,6 +93,7 @@ public class UploadCall {
     public void uploadWithInterceptorChain() throws IOException {
         List<Interceptor> interceptors = new ArrayList<>();
         interceptors.addAll(WsFileUploader.with().interceptorDispatcher().getInterceptors());
+        interceptors.add(new BaseInfoInterceptor());
         interceptors.add(new BlockBuildInterceptor());
         interceptors.add(new CacheInterceptor());
         interceptors.add(new BlockUploadInterceptor());

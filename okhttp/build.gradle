@@ -29,7 +29,6 @@ android {
 }
 
 dependencies {
-
     compileOnly project(':uploader')
     implementation "com.squareup.okhttp3:okhttp:3.9.1"
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'

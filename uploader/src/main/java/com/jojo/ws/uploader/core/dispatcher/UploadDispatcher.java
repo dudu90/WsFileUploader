@@ -5,6 +5,8 @@ import androidx.annotation.Nullable;
 
 import com.jojo.ws.uploader.UploadCall;
 import com.jojo.ws.uploader.UploadTask;
+import com.jojo.ws.uploader.WsFileUploader;
+import com.jojo.ws.uploader.core.end.EndCause;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -90,6 +92,19 @@ public final class UploadDispatcher {
     }
 
     public synchronized void enqueue(UploadCall.AsyncCall call) {
+        for (UploadCall.AsyncCall asyncCall : readyAsyncCalls) {
+            if (asyncCall.get().uploadTask().getId() == call.get().uploadTask().getId()) {
+                WsFileUploader.with().handlerDispatcher().postMain(() -> call.get().uploaderCallback().onEnd(call.get().uploadTask(), EndCause.RUNNING, null));
+                return;
+            }
+        }
+        for (UploadCall.AsyncCall asyncCall : runningAsyncCalls) {
+            if (asyncCall.get().uploadTask().getId() == call.get().uploadTask().getId()) {
+                WsFileUploader.with().handlerDispatcher().postMain(() -> call.get().uploaderCallback().onEnd(call.get().uploadTask(), EndCause.RUNNING, null));
+                return;
+            }
+        }
+
         if (runningAsyncCalls.size() < maxRequests) {
             runningAsyncCalls.add(call);
             executorService().execute(call);
