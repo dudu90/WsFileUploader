@@ -1,15 +1,11 @@
 package com.jojo.wsfileuploader;
 
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ProgressBar;
 
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.jojo.ws.uploader.UploadCall;
 import com.jojo.ws.uploader.UploadTask;
 import com.jojo.ws.uploader.UploaderCallback;
-import com.jojo.ws.uploader.WsFileUploader;
 import com.jojo.ws.uploader.core.breakstore.Block;
 import com.jojo.ws.uploader.core.end.EndCause;
 
