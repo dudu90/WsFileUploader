@@ -35,4 +35,3 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 }
 
-apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

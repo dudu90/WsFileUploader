@@ -29,7 +29,7 @@ android {
 }
 
 dependencies {
-    compileOnly project(':uploader')
+    compileOnly project(':upload_uploader')
     implementation "com.squareup.okhttp3:okhttp:3.9.1"
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
     testImplementation 'junit:junit:4.+'
@@ -37,4 +37,3 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 }
 
-apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

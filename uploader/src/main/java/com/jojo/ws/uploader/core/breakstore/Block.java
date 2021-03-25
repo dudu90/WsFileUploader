@@ -1,7 +1,5 @@
 package com.jojo.ws.uploader.core.breakstore;
 
-import android.util.Log;
-
 import com.jojo.ws.uploader.core.slice.ByteArray;
 import com.jojo.ws.uploader.core.slice.Slice;
 
@@ -86,18 +84,15 @@ public class Block {
 
     public static Block[] blocks(File file) throws FileNotFoundException {
         long fileSize = file.length();
-        int blockCount = (int) ((fileSize + sDefaultBlockSize - 1) / sDefaultBlockSize);// TODO: 2017/5/3
+        int blockCount = (int) ((fileSize + sDefaultBlockSize - 1) / sDefaultBlockSize);
         Block[] blocks = new Block[blockCount];
         long blockSize = sDefaultBlockSize;
         for (int i = 0; i < blockCount; i++) {
             if (i + 1 == blockCount) {
                 long remain = fileSize % sDefaultBlockSize;
-                blockSize = remain == 0 ? sDefaultBlockSize : remain;// TODO: 2017/5/2 最后一块
+                blockSize = remain == 0 ? sDefaultBlockSize : remain;
             }
             blocks[i] = new Block(i, i * sDefaultBlockSize, blockSize, sDefaultSliceSize);
-            //有多少块就创建多少空间
-            // TODO: 2017/5/4 需要优化,等真正执行块上传时再创建
-//				blocks[i].mByteArrayBuffer = new ByteArrayBuffer(sDefaultSliceSize);// TODO: 2017/5/2 初始化slice
         }
         return blocks;
     }
@@ -111,16 +106,15 @@ public class Block {
     }
 
     private Slice getSlice(int index) {
-        //如果没有创建buffer，创建之
         if (mByteArray == null) {
             mByteArray = new ByteArray(getSliceSize());
         }
-        long offset = start + index * getSliceSize();//从1开始
+        long offset = start + index * getSliceSize();
         if (index * getSliceSize() >= size) {
             return null;
         }
         int sliceSize = getSliceSize();
-        if ((offset + getSliceSize()) > (start + size)) {//计算最后一片
+        if ((offset + getSliceSize()) > (start + size)) {
             sliceSize = (int) (size % getSliceSize());
         }
         byte[] sliceData = mByteArray.toBuffer();
@@ -134,8 +128,8 @@ public class Block {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (sliceSize < getSliceSize()) { // 利用同一个缓存
-            return new Slice(index * getSliceSize(), sliceData);//记录最后一片
+        if (sliceSize < getSliceSize()) {
+            return new Slice(index * getSliceSize(), sliceData);
         } else {
             return new Slice(index * getSliceSize(), mByteArray);
         }

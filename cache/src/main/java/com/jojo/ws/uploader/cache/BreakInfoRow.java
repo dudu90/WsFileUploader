@@ -6,13 +6,10 @@ import android.database.Cursor;
 import com.jojo.ws.uploader.core.breakstore.BreakInfo;
 
 import static com.jojo.ws.uploader.cache.BreakSqliteKey.CREATED;
-import static com.jojo.ws.uploader.cache.BreakSqliteKey.CURRENTBLOCK;
-import static com.jojo.ws.uploader.cache.BreakSqliteKey.DIRECTUPLOADURL;
 import static com.jojo.ws.uploader.cache.BreakSqliteKey.FILEPATH;
 import static com.jojo.ws.uploader.cache.BreakSqliteKey.ID;
 import static com.jojo.ws.uploader.cache.BreakSqliteKey.LOCALFILE;
 import static com.jojo.ws.uploader.cache.BreakSqliteKey.PARTUPLOADURL;
-import static com.jojo.ws.uploader.cache.BreakSqliteKey.TYPE;
 import static com.jojo.ws.uploader.cache.BreakSqliteKey.UPLOADTOKEN;
 
 public class BreakInfoRow {
@@ -52,6 +49,18 @@ public class BreakInfoRow {
     public BreakInfo toInfo() {
         final BreakInfo breakInfo = new BreakInfo(id, partUploadUrl, uploadToken, filePath, created, localFile);
         return breakInfo;
+    }
+
+    @Override
+    public String toString() {
+        return "BreakInfoRow{" +
+                "id=" + id +
+                ", uploadToken='" + uploadToken + '\'' +
+                ", filePath='" + filePath + '\'' +
+                ", created=" + created +
+                ", partUploadUrl='" + partUploadUrl + '\'' +
+                ", localFile='" + localFile + '\'' +
+                '}';
     }
 
     public ContentValues toContentValues() {

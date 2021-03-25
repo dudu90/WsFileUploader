@@ -1,5 +1,6 @@
 package com.jojo.ws.uploader;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 
@@ -11,6 +12,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public class Utils {
+    @SuppressLint("LongLogTag")
     public static BreakStore createBreakStoreOnDisk(final Context context) {
         final String breakStoreOnDiskClassName = "com.jojo.ws.uploader.cache.BreakStoreOnDisk";
         try {

@@ -18,8 +18,6 @@ import static com.jojo.ws.uploader.cache.BreakSqliteKey.CHECKSUM;
 import static com.jojo.ws.uploader.cache.BreakSqliteKey.CRC32;
 import static com.jojo.ws.uploader.cache.BreakSqliteKey.CREATED;
 import static com.jojo.ws.uploader.cache.BreakSqliteKey.CTX;
-import static com.jojo.ws.uploader.cache.BreakSqliteKey.CURRENTBLOCK;
-import static com.jojo.ws.uploader.cache.BreakSqliteKey.DIRECTUPLOADURL;
 import static com.jojo.ws.uploader.cache.BreakSqliteKey.FILEPATH;
 import static com.jojo.ws.uploader.cache.BreakSqliteKey.ID;
 import static com.jojo.ws.uploader.cache.BreakSqliteKey.INDEX;
@@ -30,7 +28,6 @@ import static com.jojo.ws.uploader.cache.BreakSqliteKey.SIZE;
 import static com.jojo.ws.uploader.cache.BreakSqliteKey.SLICESIZE;
 import static com.jojo.ws.uploader.cache.BreakSqliteKey.START;
 import static com.jojo.ws.uploader.cache.BreakSqliteKey.TASKID;
-import static com.jojo.ws.uploader.cache.BreakSqliteKey.TYPE;
 import static com.jojo.ws.uploader.cache.BreakSqliteKey.UPLOADTOKEN;
 import static com.jojo.ws.uploader.cache.BreakSqliteKey.UPLOAD_SUCCESS;
 
@@ -49,11 +46,11 @@ public class BreakSqliteOpenHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TABLE_TASK + "( "
                 + ID + " INTEGER, "
-                + UPLOADTOKEN + " VARCHAR NOT NULL, "
-                + FILEPATH + " VARCHAR NOT NULL, "
-                + CREATED + " INTEGER, "
-                + PARTUPLOADURL + " VARCHAR NOT NULL, "
-                + LOCALFILE + " VARCHAR NOT NULL )");
+                + UPLOADTOKEN + " VARCHAR , "
+                + FILEPATH + " VARCHAR , "
+                + CREATED + " INTEGER , "
+                + PARTUPLOADURL + " VARCHAR , "
+                + LOCALFILE + " VARCHAR )");
         sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TABLE_BLOCK + "( "
                 + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -114,6 +111,7 @@ public class BreakSqliteOpenHelper extends SQLiteOpenHelper {
     }
 
     public synchronized int insert(BreakInfo breakInfo) {
+        setWriteAheadLoggingEnabled(true);
         final SQLiteDatabase sqLiteDatabase = getWritableDatabase();
         sqLiteDatabase.beginTransaction();
         int id = (int) sqLiteDatabase.insert(TABLE_TASK, null, Utils.breakToRow(breakInfo).toContentValues());
@@ -122,6 +120,7 @@ public class BreakSqliteOpenHelper extends SQLiteOpenHelper {
             blockInfoRow.setTaskId(id);
             sqLiteDatabase.insert(TABLE_BLOCK, null, blockInfoRow.toContentValues());
         }
+        sqLiteDatabase.setTransactionSuccessful();
         sqLiteDatabase.endTransaction();
         sqLiteDatabase.close();
         return id;
@@ -129,7 +128,7 @@ public class BreakSqliteOpenHelper extends SQLiteOpenHelper {
 
 
     public synchronized SparseArray<BreakInfo> loadToCache() {
-        final SQLiteDatabase database = getWritableDatabase();
+        final SQLiteDatabase database = getReadableDatabase();
         final SparseArray<BreakInfo> breakpointInfoMap = new SparseArray<>();
         Cursor breakInfoCursor = null;
         Cursor blockInfoCursor = null;
@@ -145,10 +144,10 @@ public class BreakSqliteOpenHelper extends SQLiteOpenHelper {
                 blockInfoRows.add(new BlockInfoRow(blockInfoCursor));
             }
         } finally {
-            if (breakInfoCursor != null) {
+            if (breakInfoCursor != null && !breakInfoCursor.isClosed()) {
                 breakInfoCursor.close();
             }
-            if (blockInfoCursor != null) {
+            if (blockInfoCursor != null && !blockInfoCursor.isClosed()) {
                 blockInfoCursor.close();
             }
         }

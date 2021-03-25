@@ -1,7 +1,6 @@
 package com.jojo.ws.uploader.core.breakstore;
 
 import androidx.annotation.NonNull;
-
 import com.jojo.ws.uploader.UploadTask;
 
 public interface BreakStore {

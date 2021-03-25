@@ -1,5 +1,9 @@
-include ':uploader'
-include ':okhttp'
-include ':cache'
+include ':upload_uploader'
+include ':upload_okhttp'
+include ':upload_cache'
 include ':app'
+def uploaderPath = System.getenv('HOME') + "/FlutterProject/WsFileUploader"
+project(':upload_cache').projectDir = new File(uploaderPath+"/cache")
+project(':upload_okhttp').projectDir = new File(uploaderPath+"/okhttp")
+project(':upload_uploader').projectDir = new File(uploaderPath+"/uploader")
 rootProject.name = "WsFileUploader"

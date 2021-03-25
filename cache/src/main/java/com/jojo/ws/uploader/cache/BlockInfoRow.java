@@ -15,11 +15,9 @@ import static com.jojo.ws.uploader.cache.BreakSqliteKey.SIZE;
 import static com.jojo.ws.uploader.cache.BreakSqliteKey.SLICESIZE;
 import static com.jojo.ws.uploader.cache.BreakSqliteKey.START;
 import static com.jojo.ws.uploader.cache.BreakSqliteKey.TASKID;
-import static com.jojo.ws.uploader.cache.BreakSqliteKey.UPLOADBATCH;
 
 public class BlockInfoRow {
     private int id;
-    private String uploadBatch;
     private int index;
     private int taskId;
     private long start;
@@ -32,7 +30,6 @@ public class BlockInfoRow {
 
     BlockInfoRow(Cursor cursor) {
         this.id = cursor.getInt(cursor.getColumnIndex(ID));
-        this.uploadBatch = cursor.getString(cursor.getColumnIndex(UPLOADBATCH));
         this.index = cursor.getInt(cursor.getColumnIndex(INDEX));
         this.taskId = cursor.getInt(cursor.getColumnIndex(TASKID));
         this.start = cursor.getLong(cursor.getColumnIndex(START));

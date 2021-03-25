@@ -37,6 +37,7 @@ public class BreakStoreOnDisk implements BreakStore {
     @Override
     public BreakInfo createAndInsert(UploadTask task) {
         final BreakInfo breakInfo = breakStoreOnCache.createAndInsert(task);
+        sqliteOpenHelper.insert(breakInfo);
         return breakInfo;
     }
 
